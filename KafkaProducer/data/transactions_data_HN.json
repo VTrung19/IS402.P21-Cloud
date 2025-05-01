@@ -1,0 +1,41 @@
+[
+    {
+        "TransactionID": "4d8450fd-70c0-48cd-9a65-3aa4a0643eb0",
+        "CustomerID": "6285",
+        "Timestamp": "2024-11-28T09:58:12",
+        "Items": [
+            {
+                "ProductID": "SP0054",
+                "Price": 24000,
+                "Quantity": 5
+            },
+            {
+                "ProductID": "SP0081",
+                "Price": 26000,
+                "Quantity": 1
+            }
+        ]
+    },
+    {
+        "TransactionID": "356072f5-192d-46c6-91da-9121d71bed21",
+        "CustomerID": "1685",
+        "Timestamp": "2024-10-14T12:47:57",
+        "Items": [
+            {
+                "ProductID": "SP0013",
+                "Price": 12000,
+                "Quantity": 3
+            },
+            {
+                "ProductID": "SP0059",
+                "Price": 40000,
+                "Quantity": 3
+            },
+            {
+                "ProductID": "SP0032",
+                "Price": 12000,
+                "Quantity": 9
+            }
+        ]
+    }
+ ]
