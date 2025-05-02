@@ -22,9 +22,8 @@ with open("data/transactions_data_HN.json", encoding="utf-8") as jsonfile:
             data = {
                 "TransactionID": transaction_id,
                 "CustomerID": customer_id,
-                "Timestamp": timestamp,
+                "TransactionTime": timestamp,
                 "ProductID": item["ProductID"],
-                "Price": item["Price"],
                 "Quantity": item["Quantity"],
                 "TotalPrice": item["Price"] * item["Quantity"],
                 "Store": "HN"
@@ -37,8 +36,8 @@ with open("data/transactions_data_HN.json", encoding="utf-8") as jsonfile:
             print(f"Sent item {item['ProductID']} of transaction \"{transaction_id}\" to Kafka Topic \"{topicName}\"")
 
     # Send done message
-    producer.send(topicName, {"status": "Done"})
-    producer.flush()
+    #producer.send(topicName, {"status": "Done"})
+    #producer.flush()
     print(f"HN Store: {count} items had sent successfully!")
 
     executionTime = time.time() - startTime
