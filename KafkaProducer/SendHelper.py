@@ -21,7 +21,7 @@ def build_message(transaction, item, branch_id):
         "Branch": branch_id
     }
 
-def send_data_kafka(producer, file_path, branch_id=None, topic_name="all-branches", delay=10, print_log=True, send_done=True):
+def send_data_kafka(producer, file_path, branch_id=None, topic_name="all-branches", delay=0.1, print_log=True, send_done=True):
     count = 0
     start_time = time.time()
 
@@ -34,8 +34,8 @@ def send_data_kafka(producer, file_path, branch_id=None, topic_name="all-branche
         for transaction in transactions:
             for item in transaction["Items"]:
                 data = build_message(transaction, item, branch_id)
-                producer.send(topic_name, data)
-                producer.flush()
+                producer.send(topic_name, data, key=branch_id.encode('utf-8'))
+                # producer.flush()
                 time.sleep(delay)
 
                 count += 1

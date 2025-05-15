@@ -25,7 +25,6 @@ services:
        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
        KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-       KAFKA_CREATE_TOPICS: "branch_1,branch_2,branch_3, branch_4,branch_5,branch_6,branch_7,branch_8,branch_9,branch_10"
 
   jobmanager:
     image: flink:1.18
