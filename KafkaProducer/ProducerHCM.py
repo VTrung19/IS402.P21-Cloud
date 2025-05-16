@@ -7,10 +7,10 @@ from SendHelper import get_timestamp
 producer = connection.getConnection()
 topicName = "InvoiceTopic"
 count = 0
-storeName = 'HN'
+storeName = 'HCM'
 
 # Load data from JSON file
-with open("data/transactions_data_HN.json", encoding="utf-8") as jsonfile:
+with open("data/transactions_data_HCM.json", encoding="utf-8") as jsonfile:
     transactions = json.load(jsonfile)
     startTime = time.time()
 
@@ -39,8 +39,8 @@ with open("data/transactions_data_HN.json", encoding="utf-8") as jsonfile:
             print(f"Sent item {item['ProductID']} of transaction \"{transaction_id}\" to Kafka Topic \"{topicName}\"")
 
     # Send done message
-    #producer.send(topicName, {"status": "Done"})
-    #producer.flush()
+#     producer.send(topicName, {"status": "Done"})
+#     producer.flush()
     print(f"{storeName} Store: {count} items had sent successfully!")
 
     executionTime = time.time() - startTime

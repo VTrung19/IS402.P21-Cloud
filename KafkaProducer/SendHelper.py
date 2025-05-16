@@ -53,3 +53,8 @@ def send_data_kafka(producer, file_path, branch_id=None, topic_name="all-branche
     duration = time.time() - start_time
     if print_log:
         print(f"[Branch {branch_id}] Sent {count} items in {duration:.2f} seconds.")
+
+import random
+def get_timestamp():
+    time.sleep(random.uniform(0.2, 1.0))
+    return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
