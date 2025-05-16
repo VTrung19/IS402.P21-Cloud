@@ -24,4 +24,12 @@ public class Constant {
 
         public static final String SOURCE_NAME= "Kafka Source";
     }
+
+    public static final class PostgresqlConfig {
+        public static final String DRIVER_NAME = ConfigLoader.get("org.postgresql.Driver");
+
+        public static final String JDBC_URL = ConfigLoader.get("jdbc.url");
+        public static final String USERNAME = ConfigLoader.get("jdbc.username");
+        public static final String PASSWORD = ConfigLoader.get("jdbc.password");
+    }
 }
