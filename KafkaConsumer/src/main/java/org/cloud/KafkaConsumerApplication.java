@@ -54,11 +54,17 @@ public class KafkaConsumerApplication {
                 .returns(InvoiceItem.class);
 
         // 1. Tổng doanh thu toàn hệ thống (Total Revenue)
-        invoiceStream
+        DataStream<Double> totalRevenueStream = invoiceStream
                 .map(item -> item.totalPrice)
                 .returns(Types.DOUBLE)
                 .keyBy(x -> 0)
-                .reduce(Double::sum)
+                .reduce(Double::sum);
+
+        totalRevenueStream
+                .map(total -> "[" + TimeUtils.getCurrentTime() + "] Tổng doanh thu: " + total)
+                .print();
+
+        totalRevenueStream
                 .addSink(JdbcSink.sink(
                         "INSERT INTO total_revenue (timestamp, total_revenue) VALUES (?, ?)",
                         (ps, total) -> {
@@ -77,11 +83,17 @@ public class KafkaConsumerApplication {
                 ));
 
         // 2. Tổng số lượng sản phẩm bán ra (Total Quantity Sold)
-        invoiceStream
+        DataStream<Integer> totalQuantityStream = invoiceStream
                 .map(item -> item.quantity)
                 .returns(Types.INT)
                 .keyBy(x -> 0)
-                .reduce(Integer::sum)
+                .reduce(Integer::sum);
+
+        totalQuantityStream
+                .map(totalQty -> "[" + TimeUtils.getCurrentTime() + "] Tổng số lượng sản phẩm bán ra: " + totalQty)
+                .print();
+
+        totalQuantityStream
                 .addSink(JdbcSink.sink(
                         "INSERT INTO total_quantity (timestamp, total_quantity) VALUES (?, ?)",
                         (ps, totalQty) -> {
@@ -100,52 +112,65 @@ public class KafkaConsumerApplication {
                 ));
 
         // 3. Doanh thu theo từng sản phẩm (Revenue by Product)
-        invoiceStream
-            .map(item -> Tuple2.of(item.productId, item.totalPrice))
-            .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
-            .keyBy(tuple -> tuple.f0)
-            .reduce((t1, t2) -> Tuple2.of(t1.f0, t1.f1 + t2.f1))
-            .addSink(JdbcSink.sink(
-                    "INSERT INTO product_revenue (product_id, total_revenue, timestamp) VALUES (?, ?, ?)",
-                    (ps, tuple) -> {
-                        ps.setString(1, tuple.f0); // product_id
-                        ps.setDouble(2, tuple.f1); // total_revenue
-                        ps.setString(3, TimeUtils.getCurrentTime()); // timestamp
-                    },
-                    JdbcExecutionOptions.builder()
-                            .withBatchSize(1)
-                            .build(),
-                    new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                            .withUrl(PostgresConfig.JDBC_URL)
-                            .withDriverName("org.postgresql.Driver")
-                            .withUsername(PostgresConfig.USERNAME)
-                            .withPassword(PostgresConfig.PASSWORD)
-                            .build()
-            ));
+        DataStream<Tuple2<String, Double>> productRevenueStream = invoiceStream
+                .map(item -> Tuple2.of(item.productId, item.totalPrice))
+                .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
+                .keyBy(tuple -> tuple.f0)
+                .reduce((t1, t2) -> Tuple2.of(t1.f0, t1.f1 + t2.f1));
+
+        productRevenueStream
+                .map(t -> "[" + TimeUtils.getCurrentTime() + "] Doanh thu theo sản phẩm [" + t.f0 + "]: " + t.f1)
+                .print();
+
+        productRevenueStream
+                .addSink(JdbcSink.sink(
+                        "INSERT INTO product_revenue (product_id, total_revenue, timestamp) VALUES (?, ?, ?)",
+                        (ps, tuple) -> {
+                            ps.setString(1, tuple.f0); // product_id
+                            ps.setDouble(2, tuple.f1); // total_revenue
+                            ps.setString(3, TimeUtils.getCurrentTime()); // timestamp
+                        },
+                        JdbcExecutionOptions.builder()
+                                .withBatchSize(1)
+                                .build(),
+                        new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
+                                .withUrl(PostgresConfig.JDBC_URL)
+                                .withDriverName("org.postgresql.Driver")
+                                .withUsername(PostgresConfig.USERNAME)
+                                .withPassword(PostgresConfig.PASSWORD)
+                                .build()
+                ));
 
         // 4. Doanh thu theo từng cửa hàng (Revenue by Store)
-        invoiceStream
-            .map(item -> Tuple2.of(item.store, item.totalPrice))
-            .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
-            .keyBy(t -> t.f0)
-            .reduce((t1, t2) -> Tuple2.of(t1.f0, t1.f1 + t2.f1))
-            .addSink(JdbcSink.sink(
-                    "INSERT INTO store_revenue (store_name, total_revenue, timestamp) VALUES (?, ?, ?)",
-                    (ps, tuple) -> {
-                        ps.setString(1, tuple.f0); // store_name
-                        ps.setDouble(2, tuple.f1); // total_revenue
-                        ps.setString(3, TimeUtils.getCurrentTime()); // timestamp
-                    },
-                    JdbcExecutionOptions.builder()
-                            .withBatchSize(1)
-                            .build(),
-                    new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                            .withUrl(PostgresConfig.JDBC_URL)
-                            .withDriverName("org.postgresql.Driver")
-                            .withUsername(PostgresConfig.USERNAME)
-                            .withPassword(PostgresConfig.PASSWORD)
-                            .build()
-            ));
+        DataStream<Tuple2<String, Double>> storeRevenueStream = invoiceStream
+                .map(item -> Tuple2.of(item.store, item.totalPrice))
+                .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
+                .keyBy(t -> t.f0)
+                .reduce((t1, t2) -> Tuple2.of(t1.f0, t1.f1 + t2.f1));
+
+        storeRevenueStream
+                .map(t -> "[" + TimeUtils.getCurrentTime() + "] Doanh thu theo cửa hàng [" + t.f0 + "]: " + t.f1)
+                .print();
+
+        storeRevenueStream
+                .addSink(JdbcSink.sink(
+                        "INSERT INTO store_revenue (store_name, total_revenue, timestamp) VALUES (?, ?, ?)",
+                        (ps, tuple) -> {
+                            ps.setString(1, tuple.f0); // store_name
+                            ps.setDouble(2, tuple.f1); // total_revenue
+                            ps.setString(3, TimeUtils.getCurrentTime()); // timestamp
+                        },
+                        JdbcExecutionOptions.builder()
+                                .withBatchSize(1)
+                                .build(),
+                        new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
+                                .withUrl(PostgresConfig.JDBC_URL)
+                                .withDriverName("org.postgresql.Driver")
+                                .withUsername(PostgresConfig.USERNAME)
+                                .withPassword(PostgresConfig.PASSWORD)
+                                .build()
+                ));
+
 
         env.execute("Flink Invoice Processor");
     }
