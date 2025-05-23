@@ -4,7 +4,8 @@ Yêu cầu:
 - Python 3.10.12.
 - Java 11.
 - Docker.
-- Truy cập vào thư  mục **IS402.P21-Cloud**
+- Maven 3.10.1.
+- Truy cập vào thư mục **Project**
 
 
 ## Cài đặt và sử dụng Kafka
@@ -54,7 +55,7 @@ Yêu cầu:
 
 ## Khởi chạy Kafka Consumer
 - Truy cập thư  mục **KafkaConsumer** theo công việc, vào file `pom.xml` chỉnh sửa version mới và thực hiện `mvn clean package` để tạo ra file jar mới.
-- Truy cập thư mục lưu trữ **flink** và thực hiện `./bin/flink run -c org.cloud.KafkaConsumerApplication ~/Deploy/KafkaConsumer-v1.0.0.jar` (Thay bằng version phù hợp).
+- Truy cập thư mục lưu trữ **flink** và thực hiện `./bin/flink run -c org.cloud.KafkaConsumerApplication ~/Deploy/KafkaConsumer-v1.0.0.jar` (Thay bằng đường dẫn và phiên bản phù hợp).
 - Xem thông tin các job xử lý dữ liệu trên dashboard của Flink.
 
 
