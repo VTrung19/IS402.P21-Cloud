@@ -1,11 +1,13 @@
 import json
 import time
-import ProducerConnection as connnection
+import ProducerConnection as connection
+from SendHelper import get_timestamp
 
 # Create Producer Kafka
-producer = connnection.getConnection()
+producer = connection.getConnection()
 topicName = "InvoiceTopic"
 count = 0
+storeName = 'HN'
 
 # Load data from JSON file
 with open("data/transactions_data_HN.json", encoding="utf-8") as jsonfile:
@@ -26,21 +28,17 @@ with open("data/transactions_data_HN.json", encoding="utf-8") as jsonfile:
                 "ProductID": item["ProductID"],
                 "Quantity": item["Quantity"],
                 "TotalPrice": item["Price"] * item["Quantity"],
-                "Store": "HN"
+                "Store": storeName
             }
 
             # Send message to kafka
             producer.send(topicName, data)
-            producer.flush()
             count += 1
             print(f"Sent item {item['ProductID']} of transaction \"{transaction_id}\" to Kafka Topic \"{topicName}\"")
 
-    # Send done message
-    #producer.send(topicName, {"status": "Done"})
-    #producer.flush()
-    print(f"HN Store: {count} items had sent successfully!")
+    print(f"{storeName} Store: {count} items had sent successfully!")
 
     executionTime = time.time() - startTime
     print(f"Total time: {executionTime:.2f} seconds")
 
-connnection.closeConnection(producer)
+connection.closeConnection(producer)

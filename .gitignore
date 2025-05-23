@@ -1,2 +1,4 @@
 venv/
-/KafkaConsumer/target/
+.idea./
+target/
+metabase.db/
